@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.7</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.battlebots</groupId>
+	<artifactId>battlebots</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>battlebots</name>
+	<description>Sistema de gerenciamento de robôs de batalha</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+		<kotlin.version>1.9.25</kotlin.version>
+	</properties>
+
+	<dependencies>
+		<!-- Suporte para anotações do Jackson, como @JsonFormat -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<!-- Suporte para tipos de data/hora do Java 8 (LocalDateTime, LocalDate, etc.) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Fornece Spring Data JPA, que permite mapear as classes Kotlin como entidades e interagir com o banco (PostgreSQL) via repositórios.
+		Usaremos junto com anotações como @Entity, @Id, @GeneratedValue. -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Fornece tudo o que precisamos para criar APIs REST — controladores, rotas e endpoints.
+				Aqui entra o uso de @RestController, @RequestMapping, @GetMapping, @PostMapping, etc.
+				Ou seja, é a dependência que ativa o uso direto dessas anotações. -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- o JWT (Token) é reponsável por criar tokens JWT válidos (com assinatura HMAC);
+		Validar tokens recebidos em requisições e integrar com o Jackson para leitura/escrita de JSON-->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!--Dependencia necessária para gerar um token de verificação-->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+
+		<!-- BCrypt (já vem com spring-security, mas deixar explícito se quiser) -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Necessário para o Spring entender e converter objetos Kotlin ↔ JSON.
+			Sem ele, o Kotlin data class (Robo, por exemplo) não serializa/deserializa corretamente.-->
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Bibliotecas básicas da linguagem Kotlin e suporte à reflexão (necessário para o
+			Spring interpretar as classes e anotações). -->
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-reflect</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib</artifactId>
+		</dependency>
+		<dependency>
+			<!--O Spring Security valida automaticamente o token e autoriza ou nega acesso. -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Permite recarregar automaticamente o projeto ao salvar alterações (hot reload). -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<!-- Driver JDBC do PostgreSQL — conecta o projeto ao banco.
+				Ele irá ser configurado depois no application.properties.-->
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<!-- Fornecem suporte para testes unitários e de integração em Kotlin. -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.battlebots.BattlebotsApplicationKt</mainClass>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<configuration>
+					<args>
+						<arg>-Xjsr305=strict</arg>
+					</args>
+					<compilerPlugins>
+						<plugin>spring</plugin>
+						<plugin>jpa</plugin>
+						<plugin>all-open</plugin>
+					</compilerPlugins>
+					<pluginOptions>
+						<option>all-open:annotation=jakarta.persistence.Entity</option>
+						<option>all-open:annotation=jakarta.persistence.MappedSuperclass</option>
+						<option>all-open:annotation=jakarta.persistence.Embeddable</option>
+					</pluginOptions>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-allopen</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-noarg</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
