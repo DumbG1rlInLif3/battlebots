@@ -9,10 +9,7 @@ import jakarta.persistence.*
 class Competidor(
     nome: String = "",
     email: String = "",
-    senha: String = "",
-
-    @OneToMany(mappedBy = "proprietario", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val robo: List<Robo> = mutableListOf()
+    senha: String = ""
 ) : Usuario(
     nome = nome,
     email = email,

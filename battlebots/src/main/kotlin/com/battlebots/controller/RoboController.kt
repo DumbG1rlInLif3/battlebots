@@ -1,28 +1,36 @@
 package com.battlebots.controller
 
-import com.battlebots.model.Categoria
+import com.battlebots.model.Elemento
 import com.battlebots.model.Robo
 import com.battlebots.repository.CompetidorRepository
 import com.battlebots.repository.EventoRepository
 import com.battlebots.repository.RoboRepository
+import com.battlebots.repository.CategoriaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
-// DTOs
+// DTO para criação/atualização de Robo
 data class RoboDTO(
     val nome: String = "",
     val descricao: String = "",
-    val categoriaId: Long,          // referência obrigatória à Categoria
+    val categoriaId: Long,
     val proprietarioId: Long? = null,
     val eventoId: Long? = null
 )
 
+// DTO simplificado para Categoria (evita loop infinito)
+data class CategoriaDTO(
+    val id: Long,
+    val poder: Elemento
+)
+
+// DTO de resposta de Robo
 data class RoboResponseDTO(
     val id: Long,
     val nome: String,
     val descricao: String,
-    val categoria: Categoria,       // inclui o objeto completo de Categoria
+    val categoria: CategoriaDTO,
     val proprietarioId: Long?,
     val eventoId: Long?
 )
@@ -33,7 +41,7 @@ class RoboController(
     private val roboRepository: RoboRepository,
     private val competidorRepository: CompetidorRepository,
     private val eventoRepository: EventoRepository,
-    private val categoriaRepository: com.battlebots.repository.CategoriaRepository
+    private val categoriaRepository: CategoriaRepository
 ) {
 
     @PostMapping
@@ -116,16 +124,20 @@ class RoboController(
         roboRepository.deleteById(id)
     }
 
-    // Extensão para converter automaticamente Robo -> RoboResponseDTO
+    // Extensão para converter Robo -> RoboResponseDTO
     private fun Robo.toResponse() = RoboResponseDTO(
         id = this.id,
         nome = this.nome,
         descricao = this.descricao,
-        categoria = this.categoria,
+        categoria = CategoriaDTO(
+            id = this.categoria.id,
+            poder = this.categoria.poder
+        ),
         proprietarioId = this.proprietario?.id,
         eventoId = this.evento?.id
     )
 }
+
 
 
 

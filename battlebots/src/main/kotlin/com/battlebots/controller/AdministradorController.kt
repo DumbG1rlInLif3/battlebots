@@ -5,7 +5,7 @@ import com.battlebots.service.AdministradorService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/administradores")
+@RequestMapping("/auth/administradores")
 class AdministradorController(private val administradorService: AdministradorService) {
 
     @GetMapping

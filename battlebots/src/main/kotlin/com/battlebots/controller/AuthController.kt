@@ -3,6 +3,8 @@ package com.battlebots.controller
 import com.battlebots.model.Usuario
 import com.battlebots.model.Competidor
 import com.battlebots.model.Administrador
+import com.battlebots.repository.AdministradorRepository
+import com.battlebots.repository.CompetidorRepository
 import com.battlebots.repository.UsuarioRepository
 import com.battlebots.security.JwtUtil
 import org.springframework.http.ResponseEntity
@@ -17,7 +19,9 @@ data class AuthResponse(val token: String, val role: String, val nome: String)
 class AuthController(
     private val usuarioRepository: UsuarioRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtUtil: JwtUtil
+    private val jwtUtil: JwtUtil,
+    private val competidorRepository: CompetidorRepository,
+    private val administradorRepository: AdministradorRepository
 ) {
 
     @PostMapping("/login")
@@ -61,14 +65,14 @@ class AuthController(
     fun registerCompetidor(@RequestBody competidor: Competidor): ResponseEntity<Competidor> {
         competidor.senha = passwordEncoder.encode(competidor.senha)
         competidor.role = "COMPETIDOR"
-        return ResponseEntity.ok(usuarioRepository.save(competidor))
+        return ResponseEntity.ok(competidorRepository.save(competidor))
     }
 
-    @PostMapping("/register/admin")
+    @PostMapping("/register/administrador")
     fun registerAdmin(@RequestBody admin: Administrador): ResponseEntity<Administrador> {
         admin.senha = passwordEncoder.encode(admin.senha)
         admin.role = "ADMINISTRADOR"
-        return ResponseEntity.ok(usuarioRepository.save(admin))
+        return ResponseEntity.ok(administradorRepository.save(admin))
     }
 }
 

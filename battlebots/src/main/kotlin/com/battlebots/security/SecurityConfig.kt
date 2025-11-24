@@ -34,44 +34,40 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-
-            .authorizeHttpRequests {
-
-                // LOGIN, REGISTRO
-                it.requestMatchers("/auth/**").permitAll()
+            .authorizeHttpRequests { auth ->
+                // LOGIN e REGISTRO liberados
+                auth.requestMatchers("/auth/**").permitAll()
 
                 // USER pode comprar ingresso
-                it.requestMatchers(HttpMethod.POST, "/api/ingressos/comprar").hasAnyRole("USER", "COMPETIDOR", "ADMINISTRADOR")
+                auth.requestMatchers(HttpMethod.POST, "/api/ingressos/comprar")
+                    .hasAnyRole("USER", "COMPETIDOR", "ADMINISTRADOR")
 
-                // ROTAS ADMINISTRATIVAS reais
-                it.requestMatchers(
-                    "/api/categorias/**",
-                    "/api/eventos/**",
-                    "/api/partidas/**",
-                ).hasRole("ADMINISTRADOR")
+                // ROTAS ADMINISTRATIVAS
+                auth.requestMatchers("/api/categorias/**", "/api/eventos/**", "/api/partidas/**")
+                    .hasRole("ADMINISTRADOR")
 
-                // Permitir que usuários possam listar ingressos deles
-                it.requestMatchers(HttpMethod.GET, "/api/ingressos/meus/**")
+                // Listar ingressos próprios
+                auth.requestMatchers(HttpMethod.GET, "/api/ingressos/meus/**")
                     .hasAnyRole("USER", "ADMINISTRADOR")
 
-                // Listar ingressos de evento (tanto usuário quanto admin)
-                it.requestMatchers(HttpMethod.GET, "/api/ingressos/evento/**")
+                // Listar ingressos de eventos
+                auth.requestMatchers(HttpMethod.GET, "/api/ingressos/evento/**")
                     .hasAnyRole("USER", "ADMINISTRADOR")
 
-                // Rotas acessíveis para COMPETIDOR e ADMIN
-                it.requestMatchers(
-                    "/api/robos/**"
-                ).hasAnyRole("COMPETIDOR", "ADMINISTRADOR")
+                // Rotas para COMPETIDOR e ADMIN
+                auth.requestMatchers("/api/robos/**")
+                    .hasAnyRole("COMPETIDOR", "ADMINISTRADOR")
 
-                // Qualquer outra precisa estar autenticado
-                it.anyRequest().authenticated()
+                // Qualquer outra requisição precisa estar autenticada
+                auth.anyRequest().authenticated()
             }
-
+            // Filtro JWT para autenticação stateless
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
 }
+
 
 
 
