@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.jsx
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import ComprarIngresso from "./pages/ComprarIngresso";
+import MeusIngressos from "./pages/MeusIngressos";
+import AdminIngressos from "./pages/AdminIngressos";
+import { getRole, getToken } from "./services/authService";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Estado global de autenticação
+  const [auth, setAuth] = useState({
+    token: getToken(),
+    role: getRole(),
+  });
+
+  const Protected = ({ children, allowedRoles = null }) => {
+    if (!auth.token) return <Navigate to="/login" replace />;
+    if (allowedRoles && !allowedRoles.includes(auth.role)) return <Navigate to="/" replace />;
+    return children;
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Navbar auth={auth} setAuth={setAuth} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login setAuth={setAuth} />} />
+
+        <Route
+          path="/comprar"
+          element={
+            <Protected allowedRoles={["USER"]}>
+              <ComprarIngresso />
+            </Protected>
+          }
+        />
+        <Route
+          path="/meus"
+          element={
+            <Protected allowedRoles={["USER"]}>
+              <MeusIngressos />
+            </Protected>
+          }
+        />
+        <Route
+          path="/admin/ingressos"
+          element={
+            <Protected allowedRoles={["ADMINISTRADOR"]}>
+              <AdminIngressos />
+            </Protected>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
+
+
+
+
